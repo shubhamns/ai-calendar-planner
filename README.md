@@ -2,6 +2,9 @@
 
 Full-stack calendar app with local event management, OpenAI planning assistant, and email reminders.
 
+<img width="1362" height="678" alt="image" src="https://github.com/user-attachments/assets/fb87791e-6039-45c3-86ce-9f750c4c81f8" />
+
+
 ## Features
 
 - **Authentication** — Register, login, JWT sessions (30 min)
