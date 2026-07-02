@@ -12,10 +12,10 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { EventDialog } from "@/components/calendar/EventDialog"
 import { aiApi, eventsApi } from "@/services/api"
-import type { CalendarEvent } from "@/types/api"
-import { apiError } from "@/utils/errors"
+import type { AIPlanResponse, CalendarEvent } from "@/types/api"
 import { ensureUtcIso } from "@/utils/datetime"
 import { blankEventForm, eventToForm, formToPayload } from "@/utils/eventForm"
+import { toastError, toastSuccess } from "@/utils/toast"
 
 const panel = "panel overflow-hidden"
 
@@ -48,32 +48,40 @@ export function AppPage() {
     },
     enabled: !!range,
   })
-  const saveEvent = useMutation({
+  const saveEvent = useMutation<CalendarEvent, Error, ReturnType<typeof formToPayload>>({
     mutationFn: async (values: ReturnType<typeof formToPayload>) => {
       if (editId) return eventsApi.update(editId, values)
       return eventsApi.create(values)
     },
     onSuccess: () => {
+      toastSuccess(editId ? "Event updated" : "Event created")
       setDialogOpen(false)
       setEditId(undefined)
       refresh()
     },
+    onError: (error) => { toastError(error, "Could not save event") },
   })
-  const removeEvent = useMutation({
-    mutationFn: eventsApi.delete,
+  const removeEvent = useMutation<undefined, Error, number>({
+    mutationFn: async (id: number) => {
+      await eventsApi.delete(id)
+    },
     onSuccess: () => {
+      toastSuccess("Event deleted")
       setDialogOpen(false)
       setEditId(undefined)
       refresh()
     },
+    onError: (error) => { toastError(error, "Could not delete event") },
   })
-  const aiPlan = useMutation({
+  const aiPlan = useMutation<AIPlanResponse>({
     mutationFn: () => aiApi.plan(prompt),
     onSuccess: (res) => {
       setAiText(res.response)
       setPrompt("")
       if (isPhone) setAiOpen(true)
+      toastSuccess("AI plan ready")
     },
+    onError: (error) => { toastError(error, "Something went wrong.") },
   })
   const fcEvents: EventInput[] = events.map((e) => ({
     id: String(e.id),
@@ -92,7 +100,12 @@ export function AppPage() {
     setDialogOpen(true)
   }
   const pushTimeChange = (id: number, start: Date, end: Date) => {
-    void eventsApi.update(id, { start_time: start.toISOString(), end_time: end.toISOString() }).then(refresh)
+    void eventsApi.update(id, { start_time: start.toISOString(), end_time: end.toISOString() })
+      .then(() => {
+        refresh()
+        toastSuccess("Event rescheduled")
+      })
+      .catch((error: unknown) => { toastError(error, "Could not move event") })
   }
   const onDragOrResize = (info: EventDropArg | EventResizeDoneArg) => {
     const { event } = info
@@ -176,7 +189,6 @@ export function AppPage() {
                 <Button className="w-full rounded-lg" disabled={!prompt.trim() || aiPlan.isPending} onClick={() => { aiPlan.mutate() }}>
                   {aiPlan.isPending ? "Working on it..." : "Ask AI"}
                 </Button>
-                {aiPlan.isError && <p className="text-sm text-destructive">{apiError(aiPlan.error, "Something went wrong.")}</p>}
                 {aiText && <div className="rounded-lg bg-muted/40 p-3 text-sm whitespace-pre-wrap">{aiText}</div>}
                 {aiPlan.data && <p className="text-center text-xs text-muted-foreground">{aiPlan.data.prompts_remaining} left today</p>}
               </div>

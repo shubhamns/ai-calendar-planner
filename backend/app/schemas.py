@@ -31,17 +31,17 @@ class UserResponse(BaseModel):
 
 
 class EventCreate(BaseModel):
-    title: str = Field(min_length=1, max_length=255)
-    description: str | None = None
-    location: str | None = None
+    title: str = Field(min_length=1, max_length=50)
+    description: str | None = Field(default=None, max_length=250)
+    location: str | None = Field(default=None, max_length=50)
     start_time: datetime
     end_time: datetime
 
 
 class EventUpdate(BaseModel):
-    title: str | None = Field(default=None, min_length=1, max_length=255)
-    description: str | None = None
-    location: str | None = None
+    title: str | None = Field(default=None, min_length=1, max_length=50)
+    description: str | None = Field(default=None, max_length=250)
+    location: str | None = Field(default=None, max_length=50)
     start_time: datetime | None = None
     end_time: datetime | None = None
 

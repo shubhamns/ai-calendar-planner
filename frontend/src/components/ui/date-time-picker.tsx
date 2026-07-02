@@ -36,7 +36,7 @@ function DateButton({ value, onChange, className }: { value: string; onChange: (
 export function DateTimeRangePicker({ start, end, onChange, className }: DateTimeRangePickerProps) {
   const startParts = splitDatetimeLocal(start)
   const endParts = splitDatetimeLocal(end)
-  const error = eventTimeError(start, end)
+  const error: string | null = eventTimeError(start, end)
   const bumpEnd = (nextStart: string, nextEnd: string) => {
     if (datetimeLocalToMs(nextEnd) <= datetimeLocalToMs(nextStart)) {
       return addHoursToDatetimeLocal(nextStart, 1)

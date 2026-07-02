@@ -79,6 +79,8 @@ def _build_html(*, name: str, title: str, start_label: str, end_label: str, time
 def send_event_reminder(*, to: str, name: str, title: str, start_time: datetime, end_time: datetime, location: str | None, description: str | None, timezone: str, cfg: Settings) -> None:
     if not cfg.smtp_configured:
         raise RuntimeError("Email not configured")
+    location = location.strip() if location and location.strip() else None
+    description = description.strip() if description and description.strip() else None
     tz_name = timezone if timezone and timezone != "UTC" else cfg.DEFAULT_TIMEZONE
     start_label = _format_when(start_time, tz_name, cfg)
     end_label = _format_when(end_time, tz_name, cfg)

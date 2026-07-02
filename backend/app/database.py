@@ -25,6 +25,25 @@ def _ensure_columns() -> None:
     if "reminder_sent_at" not in cols:
         with engine.begin() as conn:
             conn.execute(text("ALTER TABLE calendar_events ADD COLUMN reminder_sent_at DATETIME"))
+    _drop_legacy_columns()
+
+
+def _drop_legacy_columns() -> None:
+    from sqlalchemy import inspect, text
+    insp = inspect(engine)
+    drops: list[str] = []
+    if "calendar_events" in insp.get_table_names():
+        cols = {c["name"] for c in insp.get_columns("calendar_events")}
+        if "category" in cols:
+            drops.append("ALTER TABLE calendar_events DROP COLUMN category")
+    if "user_settings" in insp.get_table_names():
+        cols = {c["name"] for c in insp.get_columns("user_settings")}
+        if "theme_preference" in cols:
+            drops.append("ALTER TABLE user_settings DROP COLUMN theme_preference")
+    if drops:
+        with engine.begin() as conn:
+            for stmt in drops:
+                conn.execute(text(stmt))
 
 
 def get_db():

@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { authApi } from "@/services/api"
 import { useAuthStore } from "@/store/authStore"
 import { loginSchema, type LoginFormValues } from "@/utils/authSchemas"
-import { apiError } from "@/utils/errors"
+import { toastError, toastSuccess } from "@/utils/toast"
 
 export function LoginPage() {
   const navigate = useNavigate()
@@ -18,15 +18,17 @@ export function LoginPage() {
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   })
-  const login = useMutation({
+  const login = useMutation<string, Error, LoginFormValues>({
     mutationFn: authApi.login,
     onSuccess: (token) => {
       useAuthStore.setState({ token })
       void authApi.me().then((user) => {
         setAuth(token, user)
+        toastSuccess("Signed in")
         void navigate("/app")
-      })
+      }).catch((error: unknown) => { toastError(error, "Could not load profile") })
     },
+    onError: (error) => { toastError(error, "Wrong email or password") },
   })
   return (
     <div className="flex min-h-[100dvh] items-center justify-center px-4 safe-pb">
@@ -51,7 +53,6 @@ export function LoginPage() {
               <Input id="password" type="password" autoComplete="current-password" {...form.register("password")} />
               {form.formState.errors.password && <p className="text-sm text-destructive">{form.formState.errors.password.message}</p>}
             </div>
-            {login.isError && <p className="text-sm text-destructive">{apiError(login.error, "Wrong email or password")}</p>}
             <Button type="submit" className="w-full" disabled={login.isPending}>
               {login.isPending ? "Signing in..." : "Sign in"}
             </Button>

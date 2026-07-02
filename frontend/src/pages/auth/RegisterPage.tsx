@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { authApi } from "@/services/api"
 import { useAuthStore } from "@/store/authStore"
 import { registerSchema, type RegisterFormValues } from "@/utils/authSchemas"
-import { apiError } from "@/utils/errors"
+import { toastError, toastSuccess } from "@/utils/toast"
 
 export function RegisterPage() {
   const navigate = useNavigate()
@@ -18,7 +18,7 @@ export function RegisterPage() {
     resolver: zodResolver(registerSchema),
     defaultValues: { full_name: "", email: "", password: "" },
   })
-  const signup = useMutation({
+  const signup = useMutation<{ token: string; user: Awaited<ReturnType<typeof authApi.me>> }, Error, RegisterFormValues>({
     mutationFn: async (data: RegisterFormValues) => {
       await authApi.register(data)
       const token = await authApi.login({ email: data.email, password: data.password })
@@ -27,8 +27,10 @@ export function RegisterPage() {
     },
     onSuccess: ({ token, user }) => {
       setAuth(token, user)
+      toastSuccess("Account created")
       void navigate("/app")
     },
+    onError: (error) => { toastError(error, "Could not create account") },
   })
   return (
     <div className="flex min-h-[100dvh] items-center justify-center px-4 safe-pb">
@@ -58,7 +60,6 @@ export function RegisterPage() {
               <Input id="password" type="password" autoComplete="new-password" {...form.register("password")} />
               {form.formState.errors.password && <p className="text-sm text-destructive">{form.formState.errors.password.message}</p>}
             </div>
-            {signup.isError && <p className="text-sm text-destructive">{apiError(signup.error, "Could not create account")}</p>}
             <Button type="submit" className="w-full" disabled={signup.isPending}>
               {signup.isPending ? "Creating..." : "Create account"}
             </Button>

@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { DateTimeRangePicker } from "@/components/ui/date-time-picker"
 import type { EventFormState } from "@/utils/eventForm"
-import { eventTimeError } from "@/utils/eventForm"
+import { EVENT_LOCATION_MAX, EVENT_NOTES_MAX, EVENT_TITLE_MAX, clampField, eventTimeError } from "@/utils/eventForm"
 
 type Props = {
   open: boolean
@@ -19,7 +19,7 @@ type Props = {
 }
 
 export function EventDialog({ open, onOpenChange, form, onFormChange, eventId, busy, onSave, onDelete }: Props) {
-  const timeError = eventTimeError(form.start_time, form.end_time)
+  const timeError: string | null = eventTimeError(form.start_time, form.end_time)
   const canSave = form.title.trim().length > 0 && !timeError
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -29,8 +29,11 @@ export function EventDialog({ open, onOpenChange, form, onFormChange, eventId, b
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
-            <Input id="title" value={form.title} onChange={(e) => { onFormChange({ ...form, title: e.target.value }) }} />
+            <div className="flex items-center justify-between gap-2">
+              <Label htmlFor="title">Title</Label>
+              <span className="text-xs text-muted-foreground">{form.title.length}/{EVENT_TITLE_MAX}</span>
+            </div>
+            <Input id="title" value={form.title} maxLength={EVENT_TITLE_MAX} onChange={(e) => { onFormChange({ ...form, title: clampField(e.target.value, EVENT_TITLE_MAX) }) }} />
           </div>
           <DateTimeRangePicker
             start={form.start_time}
@@ -38,12 +41,18 @@ export function EventDialog({ open, onOpenChange, form, onFormChange, eventId, b
             onChange={(start_time, end_time) => { onFormChange({ ...form, start_time, end_time }) }}
           />
           <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
-            <Input id="location" value={form.location} onChange={(e) => { onFormChange({ ...form, location: e.target.value }) }} />
+            <div className="flex items-center justify-between gap-2">
+              <Label htmlFor="location">Location <span className="font-normal text-muted-foreground">(optional)</span></Label>
+              <span className="text-xs text-muted-foreground">{form.location.length}/{EVENT_LOCATION_MAX}</span>
+            </div>
+            <Input id="location" value={form.location} maxLength={EVENT_LOCATION_MAX} onChange={(e) => { onFormChange({ ...form, location: clampField(e.target.value, EVENT_LOCATION_MAX) }) }} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea id="notes" rows={3} value={form.description} onChange={(e) => { onFormChange({ ...form, description: e.target.value }) }} className="resize-none" />
+            <div className="flex items-center justify-between gap-2">
+              <Label htmlFor="notes">Notes <span className="font-normal text-muted-foreground">(optional)</span></Label>
+              <span className="text-xs text-muted-foreground">{form.description.length}/{EVENT_NOTES_MAX}</span>
+            </div>
+            <Textarea id="notes" rows={3} value={form.description} maxLength={EVENT_NOTES_MAX} onChange={(e) => { onFormChange({ ...form, description: clampField(e.target.value, EVENT_NOTES_MAX) }) }} className="resize-none" />
           </div>
         </div>
         <DialogFooter className="gap-2 pt-2 sm:justify-end">

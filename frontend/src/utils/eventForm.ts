@@ -1,6 +1,10 @@
 import type { CalendarEvent } from "@/types/api"
 import { datetimeLocalToMs, pickerValueToIso, toFormDatetime } from "@/utils/datetime"
 
+export const EVENT_TITLE_MAX = 50
+export const EVENT_LOCATION_MAX = 50
+export const EVENT_NOTES_MAX = 250
+
 export type EventFormState = {
   title: string
   description: string
@@ -45,4 +49,8 @@ export function eventTimeError(start_time: string, end_time: string): string | n
   if (Number.isNaN(start) || Number.isNaN(end)) return "Enter a valid date and time"
   if (end <= start) return "End must be after start"
   return null
+}
+
+export function clampField(value: string, max: number): string {
+  return value.length > max ? value.slice(0, max) : value
 }
