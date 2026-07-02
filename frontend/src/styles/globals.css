@@ -1,0 +1,214 @@
+@import "tailwindcss";
+@import "react-day-picker/style.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: #fafafa;
+  --foreground: #18181b;
+  --card: #ffffff;
+  --card-foreground: #18181b;
+  --popover: #ffffff;
+  --popover-foreground: #18181b;
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #27272a;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #eef2ff;
+  --accent-foreground: #4338ca;
+  --destructive: #dc2626;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #6366f1;
+  --holiday: color-mix(in srgb, #ef4444 12%, var(--background));
+  --holiday-foreground: #dc2626;
+}
+
+.dark {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
+  --primary: #818cf8;
+  --primary-foreground: #18181b;
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --accent: #312e81;
+  --accent-foreground: #e0e7ff;
+  --destructive: #f87171;
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #818cf8;
+  --holiday: color-mix(in srgb, #ef4444 18%, var(--background));
+  --holiday-foreground: #f87171;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: Inter, system-ui, sans-serif;
+    min-height: 100dvh;
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+@utility safe-pb {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+@utility panel {
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.fc-theme {
+  --fc-border-color: var(--border);
+  --fc-button-bg-color: var(--background);
+  --fc-button-border-color: var(--border);
+  --fc-button-text-color: var(--foreground);
+  --fc-button-hover-bg-color: var(--muted);
+  --fc-button-hover-border-color: var(--border);
+  --fc-button-active-bg-color: var(--primary);
+  --fc-button-active-border-color: var(--primary);
+  --fc-button-active-text-color: var(--primary-foreground);
+  --fc-today-bg-color: color-mix(in srgb, var(--primary) 8%, transparent);
+  --fc-event-bg-color: var(--primary);
+  --fc-event-border-color: var(--primary);
+  --fc-event-text-color: var(--primary-foreground);
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: var(--muted);
+}
+.fc-theme .fc-toolbar {
+  gap: 0.5rem;
+  margin-bottom: 0.75rem !important;
+}
+.fc-theme .fc-toolbar-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.fc-theme .fc-toolbar-chunk {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+.fc-theme .fc-button-group {
+  display: inline-flex;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+.fc-theme .fc-button {
+  background: var(--background) !important;
+  color: var(--foreground) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 0.4rem 0.75rem !important;
+  text-transform: capitalize;
+}
+.fc-theme .fc-button + .fc-button {
+  border-left: 1px solid var(--border) !important;
+}
+.fc-theme .fc-button:hover:not(:disabled) {
+  background: var(--muted) !important;
+  color: var(--foreground) !important;
+}
+.fc-theme .fc-button-active,
+.fc-theme .fc-button:active:not(:disabled) {
+  background: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+}
+.fc-theme .fc-today-button {
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  margin-left: 0 !important;
+}
+.fc-theme .fc-today-button.fc-button-active {
+  background: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  border-color: var(--primary) !important;
+}
+.fc-theme .fc-prev-button,
+.fc-theme .fc-next-button {
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
+.fc-theme .fc-event {
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.fc-theme .fc-day-sun,
+.fc-theme .fc-timegrid-col.fc-day-sun {
+  background: var(--holiday) !important;
+}
+.fc-theme .fc-col-header-cell.fc-day-sun .fc-col-header-cell-cushion {
+  color: var(--holiday-foreground);
+  font-weight: 600;
+}
+.fc-theme .fc-daygrid-day.fc-day-sun .fc-daygrid-day-number {
+  color: var(--holiday-foreground);
+  font-weight: 600;
+}
+.fc-theme .fc-day-sun.fc-day-today {
+  background: color-mix(in srgb, var(--holiday) 65%, var(--primary) 12%) !important;
+}
+.rdp-sunday .rdp-day_button {
+  color: var(--holiday-foreground);
+  font-weight: 600;
+}
+@media (max-width: 640px) {
+  .fc-theme .fc-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .fc-theme .fc-toolbar-chunk {
+    justify-content: center;
+  }
+}
